@@ -12,6 +12,7 @@ IncludeTemplateLangFile(__FILE__);
     <meta content="IE=edge" http-equiv="X-UA-Compatible">
     <meta charset="utf-8">
     <meta name="yandex-verification" content="17f5435fbacc410e" />
+    <meta name="cmsmagazine" content="05873d095917ef72a757d3224c3c32cf" />
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
     <meta name="yandex-verification" content="17f5435fbacc410e" />
     <link href="https://fonts.googleapis.com/css?family=Roboto:400,500,700&amp;display=swap&amp;subset=cyrillic" rel="stylesheet">
