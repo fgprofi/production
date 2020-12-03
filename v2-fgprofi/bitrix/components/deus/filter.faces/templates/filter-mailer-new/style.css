@@ -1,0 +1,12 @@
+.form_filter{
+	display: none;
+}
+.form_filter.active{
+	display: block;
+}
+.sign_in_option.user-search__row{
+	display: none;
+}
+/*.form_filter .input_box input,.form_filter .input_box select{
+	width: initial;
+}*/

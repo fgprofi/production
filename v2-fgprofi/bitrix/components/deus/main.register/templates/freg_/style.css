@@ -1,0 +1,102 @@
+div.bx-auth-reg input.bx-auth-input {
+	vertical-align: middle;
+}
+
+div.bx-auth-reg span.bx-auth-secure {
+	background-color: #FFFAE3;
+	border: 1px solid #DEDBC8;
+	padding: 2px;
+	display: inline-block;
+	vertical-align: middle;
+}
+
+div.bx-auth-reg div.bx-auth-secure-icon {
+	background-image: url(images/sec.png);
+	background-repeat: no-repeat;
+	background-position: center;
+	width: 19px;
+	height: 18px;
+}
+
+div.bx-auth-reg div.bx-auth-secure-unlock {
+	background-image: url(images/sec-unlocked.png);
+}
+
+div.hidden_field {
+	display: none;
+}
+
+.help-description {
+	display: none;
+
+}
+
+#form_title_reg_description {
+	max-width: 600px;
+}
+
+.sign_in .help {
+	width: 16px;
+	height: 16px;
+	border-radius: 50%;
+	background: #deeaea;
+	cursor: pointer;
+	text-align: center;
+	position: absolute;
+	right: 110px;
+	bottom: 15px;
+}
+
+.form_title_reg {
+	position: relative;
+}
+
+.sign_in_alert {
+	display: none;
+}
+
+.sign_in_alert.active {
+	display: block;
+	text-align: center;
+	margin-top: 15px;
+	color: #F38787;
+	cursor: pointer;
+}
+
+#sign_in_alert_text {
+	display: none;
+	max-width: 600px;
+}
+
+@media (max-width: 1015px) {
+	.login .sign_in .help {
+		right: 25px;
+		bottom: 8px;
+	}
+}
+
+@media (max-width: 515px) {
+	.login .sign_in .help {
+		right: -22px;
+		bottom: 6px;
+	}
+}
+.veryweak{
+    color:#B40404;
+}
+.weak{
+    color:#DF7401;
+}
+.medium{
+    color:#FFFF00;
+}
+.strong{
+    color:#9AFE2E;
+}
+.verystrong{
+    color:#0B610B;
+}
+.help.password_reg_description,.help.subdivision_description{
+	right: -25px;
+	bottom: 16px;
+}

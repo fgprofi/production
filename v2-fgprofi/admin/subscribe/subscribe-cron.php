@@ -1,4 +1,6 @@
 <?
+// echo"dddd";
+// die("sss");
 $_SERVER["DOCUMENT_ROOT"] = "/home/bitrix/ext_www/v2-fgprofi";
 require($_SERVER["DOCUMENT_ROOT"] . "/bitrix/header.php");
 use \Bitrix\Highloadblock\HighloadBlockTable as HLBT;
@@ -102,22 +104,43 @@ use \Bitrix\Highloadblock\HighloadBlockTable as HLBT;
 						// }
 						foreach ($users as $user) {
 							if($user["PROPERTY_EMAIL_VALUE"] != ""){
-								$arEventFields = array(
-									"EMAIL_TO"=>$user["PROPERTY_EMAIL_VALUE"],
-									"THEME"=>$result["FIELDS"]["NAME"],
-									"RUBRIC"=>$allRubric[$result["PROP"]["RUBRIC"]["VALUE"]],
-									"CATEGORY"=>"",
-									"TEXT"=>$result["FIELDS"]["DETAIL_TEXT"]
-								);
-								if($result["PROP"]["CATEGORY_USERS"]["VALUE"] == "Юридические лица"){
-									$arEventFields["CATEGORY"] = " (".$result["PROP"]["CATEGORY_USERS"]["VALUE"].")";
+								$send = true;
+								$realUserId = false;
+								if($user["PROPERTY_FIZ_USER_ID_VALUE"]){
+									$obU = $el->getByID($user["PROPERTY_FIZ_USER_ID_VALUE"])->getNextElement();
+									$resU["props"] = $obU->getProperties();
+									$realUserId = $resU["props"]["USER_ID"]["VALUE"];
+									if($resU["props"]["PROOF_OF_MAILING"]["VALUE"] == ""){
+										$send = false;
+									}
+								}else{
+									$realUserId = $user["PROPERTY_USER_ID_VALUE"];
+									if($user["PROPERTY_PROOF_OF_MAILING_VALUE"] == ""){
+										$send = false;
+									}
 								}
-								
-								// echo "<pre>"; print_r($arEventFields); echo "</pre>";
-								// echo "<pre>"; print_r($result["PROP"]["FILE"]["VALUE"]); echo "</pre>";
-								if(CEvent::Send("SEND_MAILING", "s1", $arEventFields, "Y", "", array($result["PROP"]["FILE"]["VALUE"]))){
-									echo "Отправили рассылку на ".$user["PROPERTY_EMAIL_VALUE"]."<br>";
+								if($send){
+									$rsUser = CUser::GetByID($realUserId);
+									$arUser = $rsUser->Fetch();
+									$arEventFields = array(
+										"EMAIL_TO"=>$user["PROPERTY_EMAIL_VALUE"],
+										"THEME"=>$result["FIELDS"]["NAME"],
+										"RUBRIC"=>$allRubric[$result["PROP"]["RUBRIC"]["VALUE"]],
+										"CATEGORY"=>"",
+										"ID"=>$result["FIELDS"]["ID"],
+										"TEXT"=>$result["FIELDS"]["DETAIL_TEXT"],
+										"UNSUBSCRIBE"=>"<br><a href='/unsubscribe/".$arUser["CHECKWORD"]."/'>Отписатся от рассылки</a>",
+									);
+									if($result["PROP"]["CATEGORY_USERS"]["VALUE"] == "Юридические лица"){
+										$arEventFields["CATEGORY"] = " (".$result["PROP"]["CATEGORY_USERS"]["VALUE"].")";
+									}
 									
+									// echo "<pre>"; print_r($arEventFields); echo "</pre>";
+									// echo "<pre>"; print_r($result["PROP"]["FILE"]["VALUE"]); echo "</pre>";
+									if(CEvent::Send("SEND_MAILING", "s1", $arEventFields, "Y", "", array($result["PROP"]["FILE"]["VALUE"]))){
+										echo "Отправили рассылку на ".$user["PROPERTY_EMAIL_VALUE"]."<br>";
+										
+									}
 								}
 							}
 						}

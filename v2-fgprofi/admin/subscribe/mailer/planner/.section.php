@@ -1,0 +1,6 @@
+<?
+$sSectionName = "Планировщик";
+$arDirProperties = array(
+
+);
+?>

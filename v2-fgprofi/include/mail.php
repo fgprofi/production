@@ -1,0 +1,1 @@
+<a <?if (!$USER->IsAuthorized()){echo "class='unregister-support-popup'";}?> href="/support/?ID=0&edit=1">Написать разработчику</a>

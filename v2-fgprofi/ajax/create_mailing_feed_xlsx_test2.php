@@ -72,7 +72,7 @@ foreach($arResult as $mailingId => $mailing){
 			$strTicket = "Тикет: ".$arTicket["TITLE"]." (".$arTicket["ID"].")\r";
 			$mess = CTicket::GetMessageList($by, $order, array("TICKET_ID" => $arTicket["ID"],"IS_MESSAGE" => "Y"), $c, $CHECK_RIGHTS);
 			$message = "";
-			$arDataMSG[] = $arTicket["ID"];
+			
 			while($arMess = $mess->Fetch())
 			{
 				$msg_date = date('d.m.Y',strtotime($mailing['PROP']['DATE_SEND']['VALUE']));

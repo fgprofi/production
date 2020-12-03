@@ -1,0 +1,25 @@
+.form_filter{
+	display: none;
+}
+.form_filter.active{
+	display: block;
+}
+/*.form_filter .input_box input,.form_filter .input_box select{
+	width: initial;
+}*/
+#popup_progress{
+	display: none;
+}
+#popup_progress .main-content__report-progress .progress-bg {
+    position: absolute;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background: url(/bitrix/templates/pakk/img/progress-bar.png);
+}
+#popup_progress .main-content__report-progress:before{
+	display: none;
+}
+#popup_progress .fancybox-close-small{
+	display: none;
+}

@@ -45,6 +45,7 @@ if (isset($_REQUEST)) {
             "MESSAGE" => $arDataRes['text_mail'],
             "CATEGORY_SID" => $arDataRes['list'],
             "AUTO_CLOSE_DAYS" => 365,
+            "UF_AUTOR_FIO" => $arDataRes['name']
         );
         if($arDataRes['user_id'] != ""){
             $arFields["OWNER_USER_ID"] = $arDataRes['user_id'];

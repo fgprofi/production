@@ -128,10 +128,10 @@ $APPLICATION->SetTitle("");
                 </a>
                 <a class="nav__item item-nav" target="_blank" href="http://numbers.fgprofi.ru/">
                     <div class="item-nav__name item-nav__name_news">
-                        Информационные материалы
+                        Карты, графики, инфографика
                     </div>
                     <div class="item-nav__desc">
-                        Карты, графики, инфографика по финансовой грамотности
+                        Материалы по финансовой грамотности и защите прав потребителей
                     </div>
                 </a>
             </div>

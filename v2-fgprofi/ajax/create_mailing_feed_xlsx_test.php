@@ -38,6 +38,20 @@ $arHeads = array(
 	"Прикрепленые файлы:",
 	"Получатели:",
 );
+$arCol = array(
+	"A" => "Получатель",
+	"B" => "Ответ",
+	"C" => "Дата, время",
+	"D" => "Почта получателя",
+	"E" => "Прикрепление",
+);
+$arColProp = array(
+	"A" => "OWNER_SID",
+	"B" => "MESSAGE",
+	"C" => "DATE_CREATE",
+	"D" => "OWNER_EMAIL",
+	"E" => "FILE",
+);
 while($resList = $ob->GetNextElement()){
 	$arData["PROP"] = $resList->GetProperties();
 	$arData["FIELDS"] = $resList->GetFields();
@@ -81,65 +95,74 @@ foreach($arResult["ITEMS"] as $mailingId => $mailing){
 		$objWorkSheet->getStyle("B".$colNum)->getAlignment()->setWrapText(true);
 		$colNum++;
 	}
-	
-	// $arUsers = getUsers($arMailingProps["USERS"]["VALUE"]);
-	// $thisRubric = $arRubric[$arMailingProps["RUBRIC"]["VALUE"]]["UF_NAME"];
-	// foreach ($arUsers as $key => $user) {
-	// 	$arFilter = Array(
-	// 		//"TITLE"=> "Re: ".$arMailingFields["NAME"]." (".$thisRubric.")",
-	// 		"TITLE"=> "%<".$arMailingFields["ID"].">%",
-	// 		"OWNER"=>$user["PROPERTY_USER_ID_VALUE"],
-	// 	);
-	// 	$by = "s_id";
-	// 	$order = "asc";
-	// 	$tickets = CTicket::GetList($by, $order, $arFilter, $is_filtered);
-	// 	$strTicket = "";
-	// 	$arTicket = "";
-	// 	while($ar = $tickets->Fetch()) 
-	// 	{
-	// 		$arTicket = $ar;
-	// 		$strTicket = "Тикет: ".$arTicket["TITLE"]." (".$arTicket["ID"].")\r";
-	// 		$mess = CTicket::GetMessageList($by, $order, array("TICKET_ID" => $arTicket["ID"],"IS_MESSAGE" => "Y"), $c, $CHECK_RIGHTS);
-	// 		$message = "";
-	// 		while($arMess = $mess->Fetch()) 
-	// 		{
-	// 			$strMes = $arMess["OWNER_EMAIL"]." (".$arMess["DATE_CREATE"].")\r";
+	foreach ($arCol as $keyCol => $colTitle) {
+		$objWorkSheet->setCellValue($keyCol.$colNum, "");
+	}
+	$colNum++;
+	foreach ($arCol as $keyCol => $colTitle) {
+		$objWorkSheet->setCellValue($keyCol.$colNum, $colTitle);
+	}
+	$colNum++;
+	$arUsers = getUsers($arMailingProps["USERS"]["VALUE"]);
+	$thisRubric = $arRubric[$arMailingProps["RUBRIC"]["VALUE"]]["UF_NAME"];
 
-	// 			$strTicket .= $strMes;
-	// 			$message = $arMess["MESSAGE"];
-	// 			if(stristr($message, $strExplod) !== FALSE) {
-	// 				$strTicket .= stristr($message, $strExplod, true);
-	// 			}else{
-	// 				$strTicket .= $message;
-	// 			}
-	// 			$strTicket .= "\r\r";
-	// 			//echo "<pre>"; print_r($arMess); echo "</pre>";
-	// 		}
-	// 	}
-	// 	if($arTicket != ""){
-	// 		$rowNum++;
-	// 		$objWorkSheet->setCellValue("A".$rowNum, $user["NAME"]);
-	// 		$objWorkSheet->setCellValue("B".$rowNum, $strTicket);
-	// 		$objWorkSheet->getStyle("B".$rowNum)->getAlignment()->setWrapText(true);
-	// 	}
-		// if($strTicket != ""){
-		// 	$rowUser .= "\"".$user["NAME"]."\";";
-		// 	$strTicket = str_replace(chr(38), "", $strTicket);
-		// 	$strTicket = str_replace("quot;", "", $strTicket);
-		// 	$strTicket = str_replace('"', "", $strTicket);
-		// 	$strTicket = str_replace("&quot;","",htmlspecialchars_decode(str_replace(array('\"',),'',$strTicket)));
-		// 	$rowUser .= "\"".$strTicket."\"".$row_delimiter;
-		// }
-		
-	//}
+	foreach ($arUsers as $key => $user) {
+		$arFilter = Array(
+			"TITLE"=> "%<".$arMailingFields["ID"].">%",
+			"OWNER"=>$user["PROPERTY_USER_ID_VALUE"],
+		);
+		$by = "s_id";
+		$order = "asc";
+
+
+		$tickets = CTicket::GetList($by, $order, $arFilter, $is_filtered);
+		$strTicket = "";
+		$arTicket = "";
+		$arDataMSG = array();
+		while($ar = $tickets->Fetch()) 
+		{
+			$arTicket = $ar;
+			$strTicket = "Тикет: ".$arTicket["TITLE"]." (".$arTicket["ID"].")\r";
+			$mess = CTicket::GetMessageList($by, $order, array("TICKET_ID" => $arTicket["ID"],"IS_MESSAGE" => "Y"), $c, $CHECK_RIGHTS);
+			
+			while($arMess = $mess->Fetch())
+			{
+				$msg_date = date('d.m.Y',strtotime($mailing['PROP']['DATE_SEND']['VALUE']));
+				preg_match('|([A-Za-zа-яА-Я0-9][\s\S][A-Za-zа-яА-Я0-9]*?)[\s\S]*?'.$msg_date.'|',$arMess['MESSAGE'],$matches,PREG_UNMATCHED_AS_NULL);
+				if(trim(str_replace($msg_date,'',$matches[0])))
+					$msg = trim(str_replace($msg_date,'',$matches[0]));
+				else
+					$msg = $arMess['MESSAGE'];
+
+				$arDataMSG[$arTicket["ID"]][] = array(
+					'DATE_CREATE' => $arMess["DATE_CREATE"],
+					'OWNER_EMAIL' => $arMess['OWNER_EMAIL'],
+					'OWNER_SID' => $arMess['OWNER_SID'],
+					'MESSAGE' => $msg,
+					'FILE' => "",
+				);
+
+			}foreach ($arDataMSG[$arTicket["ID"]] as $keyM => $arDataMSGItem) {
+				$indexAr = 0;
+				foreach ($arColProp as $keyCol => $colProp) {
+					$objWorkSheet->setCellValue($keyCol.$colNum, $arDataMSGItem[$colProp]);
+					$indexAr++;
+				}
+				$colNum++;
+			}
+			
+			
+			foreach ($arCol as $keyCol => $colTitle) {
+				$objWorkSheet->setCellValue($keyCol.$colNum, "");
+			}
+			$colNum++;
+		}
+	}
 	if(strlen($arMailingFields["NAME"])>26){
 		$objWorkSheet->setTitle(mb_strimwidth($arMailingFields["NAME"], 0, 25, "..."));
 	}else{
 		$objWorkSheet->setTitle($arMailingFields["NAME"]);
 	}
-	
-	// //$objWorkSheet->setTitle("111");
-
 
 
 	// $objWorkSheet->getColumnDimension("A")->setAutoSize(true);
@@ -152,65 +175,5 @@ $objWorkSheet = $objPHPExcel->setActiveSheetIndex(0);
 $objWriter->save('php://output');
 
 
-
-
-/*if(isset($data["mailing_id"]) && $data["mailing_id"] != ""){
-	$arRubric = getMailingRubric();
-	$res = CIBlockElement::GetByID($data["mailing_id"]);
-	$arHeads = array(
-		"PROFILES"=>"Пользователи", 
-		"MESSAGES"=>"Переписка"
-	);
-	
-	$row_delimiter = "\n";
-	$str = implode(";",$arHeads).$row_delimiter;
-	if($obMailing = $res->GetNextElement()){
-		$arMailingProps = $obMailing->GetProperties();
-		$arMailingFields = $obMailing->GetFields();
-		$arUsers = getUsers($arMailingProps["USERS"]["VALUE"]);
-		$thisRubric = $arRubric[$arMailingProps["RUBRIC"]["VALUE"]]["UF_NAME"];
-		$rowUser = "";
-		foreach ($arUsers as $key => $user) {
-			
-			$arFilter = Array(
-				"TITLE"=> "Re: ".$arMailingFields["NAME"]." (".$thisRubric.")",
-				"OWNER"=>$user["PROPERTY_USER_ID_VALUE"],
-			);
-			$by = "s_id";
-			$order = "asc";
-			$tickets = CTicket::GetList($by, $order, $arFilter, $is_filtered);
-			$strTicket = "";
-			while($ar = $tickets->Fetch()) 
-			{
-				$arTicket = $ar;
-				$strTicket = "Тикет: ".$arTicket["TITLE"]." (".$arTicket["ID"].")\r";
-				$mess = CTicket::GetMessageList($by, $order, array("TICKET_ID" => $arTicket["ID"],"IS_MESSAGE" => "Y"), $c, $CHECK_RIGHTS);
-				while($arMess = $mess->Fetch()) 
-				{
-					$strMes = $arMess["OWNER_EMAIL"]." (".$arMess["DATE_CREATE"].")\r";
-					$strTicket .= $strMes;
-					$strTicket .= $arMess["MESSAGE"]."\r\r";
-					//echo "<pre>"; print_r($arMess); echo "</pre>";
-				}
-			}
-			if($strTicket != ""){
-				$rowUser .= "\"".$user["NAME"]."\";";
-				$strTicket = str_replace(chr(38), "", $strTicket);
-				$strTicket = str_replace("quot;", "", $strTicket);
-				$strTicket = str_replace('"', "", $strTicket);
-				$strTicket = str_replace("&quot;","",htmlspecialchars_decode(str_replace(array('\"',),'',$strTicket)));
-				$rowUser .= "\"".$strTicket."\"".$row_delimiter;
-			}
-			
-		}
-		$str .= $rowUser;
-		//echo "<pre>"; print_r($arUsers); echo "</pre>";
-	}
-}*/
-// header("Content-type: csv/plain");
-// header("Content-Disposition: attachment; filename=users_by_filter_".date("d_m_Y").".csv");
-// ob_end_clean();
-// echo $str;
-// exit;
 
 ?><?require($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/epilog_after.php");?>

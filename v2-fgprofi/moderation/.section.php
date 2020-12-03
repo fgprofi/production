@@ -1,0 +1,6 @@
+<?
+$sSectionName = "Модерация";
+$arDirProperties = Array(
+
+);
+?>
